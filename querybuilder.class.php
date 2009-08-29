@@ -64,6 +64,19 @@ class QueryBuilder {
 
 	private function buildSelectQuery($sTable) {
 
+		$oColumns = $this->oDataRecord->getColumns();
+		foreach ($oColumns as $oColumn) {
+			$aColumns[] = sprintf("`%s`", $oColumn->getName());
+		}
+
+		$sColumns = implode(',', $aColumns);
+
+		if ($this->bPrepared === true) {
+			$sWhere = "id = :id";
+		} else {
+			$sWhere = sprintf("id = %d", $this->oDataRecord->getID());
+		}
+
 		return sprintf(self::QUERY_SELECT_FORMAT, $sColumns, $sTable, $sWhere);
 
 	}
@@ -109,7 +122,7 @@ class QueryBuilder {
 		}
 
 		$sColumns = substr($sColumns, 0, -1);
-		
+
 		if ($this->bPrepared === true) {
 			$sWhere = "id = :id";
 		} else {
@@ -131,6 +144,7 @@ class QueryBuilder {
 				return $this->buildDeleteParams();
 				break;
 			case 'SELECT' :
+				return $this->buildSelectParams();
 				break;
 		}
 	}
@@ -153,6 +167,10 @@ class QueryBuilder {
 			}
 		}
 		return $aBindValues;
+	}
+	
+	private function buildSelectParams() {
+		return array('id' => $this->oDataRecord->getID());
 	}
 
 	private function buildDeleteParams() {

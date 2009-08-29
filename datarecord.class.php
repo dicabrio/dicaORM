@@ -250,12 +250,13 @@ abstract class DataRecord {
 	 */
 	private function load() {
 		if ($this->oColumns->count()) {
-			$sql = "SELECT ".$this->attributes->getAttributesString()." FROM `".$this->table."` WHERE id = :id";
+//			$sql = "SELECT ".$this->attributes->getAttributesString()." FROM `".$this->table."` WHERE id = :id";
+			$oQueryBuilder = new QueryBuilder('SELECT', $this);
 
 			$oDatabaseHandler = self::getConnection();
-			$statement = $oDatabaseHandler->prepare($query);
-			$statement->bindParam(':id', intval($this->id));
-			$statement->execute();
+			$statement = $oDatabaseHandler->prepare($oQueryBuilder->getQuery(true));
+//			$statement->bindParam(':id', intval($this->id));
+			$statement->execute($oQueryBuilder->getPreparedValues());
 
 			$row = $statement->fetch(PDO::FETCH_ASSOC);
 			// load the attribute values
