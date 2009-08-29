@@ -424,7 +424,7 @@ abstract class DataRecord {
 
 		if ($conditions !== null) {
 			$sql .= " WHERE ".$conditions->getQuery();
-			$aBindings = array_merge($aBindings, $conditions->toArray());
+			$aBindings = array_merge($aBindings, (array) $conditions);
 		}
 
 		if ($orderings !== null) {
