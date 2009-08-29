@@ -321,7 +321,6 @@ abstract class DataRecord {
 		if (preg_match('/^(.*)_id$/', $columnName, $matches)) {
 			$attr->setForeignKey(true);
 			$attr->setForeignKeyTable($matches[1]);
-			$attr->setJoinType($joinType);
 		}
 
 		$this->oColumns->add($attr);
