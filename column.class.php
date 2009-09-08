@@ -7,7 +7,7 @@
  * @author Robert Cabri <robert@dicabrio.com>
  * @copyright Robert Cabri
  */
-class Attribute {
+class Column {
 
 	/**
 	 *	@var string
@@ -43,7 +43,7 @@ class Attribute {
 	 *	@var boolean
 	 */
 	private $isFk = false;
-	
+
 	/**
 	 * @var boolean
 	 */
@@ -53,7 +53,7 @@ class Attribute {
 	 *	@var string
 	 */
 	private $fkTable = null;
-	
+
 	private $joinType = 'inner';
 
 
@@ -82,14 +82,14 @@ class Attribute {
 	 */
 	public function setValue($value) {
 		$this->validateValue($value);
-		
+
 		if ($this->value != $value) {
 			$this->bIsModified = true;
 		}
-		
+
 		$this->value = $value;
 	}
-	
+
 	/**
 	 * @return boolean
 	 */
@@ -195,7 +195,7 @@ class Attribute {
 	public function setForeignKeyTable($fkTable) {
 		$this->fkTable = $fkTable;
 	}
-	
+
 	/**
 	 * @param string $joinType
 	 * @return void
@@ -218,10 +218,10 @@ class Attribute {
 	public function getName() {
 		return $this->name;
 	}
-	
+
 	/**
 	 * @TODO also fire custom validators
-	 * 
+	 *
 	 * @param string $value
 	 * @return void
 	 */
@@ -232,17 +232,17 @@ class Attribute {
 				if (strlen($value) > $this->size) {
 					throw new RecordException('The value of `'.$this->name.'` is to long');
 				}
-				
+
 				if (!$this->isNullable && empty($value)) {
 					throw new RecordException('The value of `'.$this->name.'` may not be null');
 				}
-			break;
+				break;
 			case DataTypes::INT:
 				if (!is_int($value) && !ctype_digit($value)) {
 					throw new RecordException('The value of is `'.$this->name.'` no number');
 				}
-			break;
-		} 
+				break;
+		}
 	}
 }
 

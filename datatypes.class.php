@@ -13,7 +13,7 @@ class DataTypes
 	const ENUM = 'ENUM';
 	const SET = 'SET';
 	const TEXT = 'TEXT';
-	
+
 	private function __construct() {}
 }
 

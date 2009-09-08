@@ -168,7 +168,7 @@ class QueryBuilder {
 		}
 		return $aBindValues;
 	}
-	
+
 	private function buildSelectParams() {
 		return array('id' => $this->oDataRecord->getID());
 	}

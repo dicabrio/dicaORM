@@ -20,73 +20,73 @@
  * include('datafactory.class.php');
  * include('datatypes.class.php');
  * include('querybuilder.class.php');
- * 
- * 
+ *
+ *
  * class Test extends DataRecord {
- * 
+ *
  * 	public function __construct($iID = null) {
  * 		parent::__construct(__CLASS__, $iID);
  * 	}
- * 
+ *
  * 	// define the method to define the columns to map to the db
  * 	protected function defineColumns() {
  * 		parent::addColumn('id', DataTypes::INT, false, false);
  * 		parent::addColumn('name', DataTypes::VARCHAR, 255, false);
  * 		parent::addColumn('other', DataTypes::VARCHAR, 255, false);
  * 	}
- * 
+ *
  * 	// its optional to create getters/setters
  * 	// it will come in handy when using an IDE like eclipse of netbeans
  * 	public function getName() {
  * 		return $this->name;
  * 	}
- * 
+ *
  * 	public function setName($sName) {
  * 		$this->name = $sName;
  * 	}
- * 
+ *
  * 	public function getOther() {
  * 		$this->other;
  * 	}
- * 
+ *
  * 	public function setOther($sOther) {
  * 		$this->other = $sOther;
  * 	}
- * 	
+ *
  * 	public static function findAll() {
  * 		return parent::findAll(__CLASS__, self::ALL);
  * 	}
  * }
- * 
+ *
  * try {
  * 	$oDatabase = new PDO('mysql:dbname=##db_name##;host=localhost', '##db_user##', '##db_pass##');
  * 	$oData = DataFactory::getInstance();
  * 	$oData->addConnection($oDatabase, 'default');
  * 	$oData->beginTransaction();
- * 	
+ *
  * 	$aAll = Test::findAll();
  * 	foreach ($aAll as $oTesting) {
  * 		$oTesting->delete();
  * 	}
- * 	
+ *
  * 	echo $iRandomValue = mt_rand(1,10);
- * 
+ *
  * 	$oTest = new Test();
  * 	$oTest->setName('Robert Cabri'.$iRandomValue);
  * 	$oTest->save();
- * 	
+ *
  * 	$oTest->setName($iRandomValue.'Robert Cabri');
  * 	$oTest->save();
- * 
+ *
  * 	$oData->commit();
  * } catch (Exception $e) {
  * 	echo $e->getMessage();
  * 	$oData->rollBack();
  * }
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
  * @package DataRecord
  * @author Robert Cabri <robert@dicabrio.com>
  * @copyright Robert Cabri
@@ -99,7 +99,7 @@ abstract class DataRecord {
 	 * @var ColumnAggr
 	 */
 	private $oColumns = null;
-	
+
 	/**
 	 * @var string
 	 */
@@ -183,7 +183,7 @@ abstract class DataRecord {
 	public function getTable() {
 		return $this->table;
 	}
-	
+
 	/**
 	 * @return ColumnAggr
 	 */
@@ -205,14 +205,14 @@ abstract class DataRecord {
 		} else {
 			$this->insert();
 		}
-		
+
 		return true;
 	}
 
 	private function insert() {
-		
+
 		$oQueryBuilder = new QueryBuilder('INSERT', $this);
-		
+
 		$oDatabaseHandler = self::getConnection();
 		$statement = $oDatabaseHandler->prepare($oQueryBuilder->getQuery(true));
 		$statement->execute($oQueryBuilder->getPreparedValues());
@@ -229,7 +229,7 @@ abstract class DataRecord {
 		if (!$this->id) {
 			throw new RecordException($this->table." object needs an ID to update()");
 		}
-		
+
 		$oQueryBuilder = new QueryBuilder('UPDATE', $this);
 
 		$oDatabaseHandler = self::getConnection();
@@ -250,12 +250,12 @@ abstract class DataRecord {
 	 */
 	private function load() {
 		if ($this->oColumns->count()) {
-//			$sql = "SELECT ".$this->attributes->getAttributesString()." FROM `".$this->table."` WHERE id = :id";
+			//			$sql = "SELECT ".$this->attributes->getAttributesString()." FROM `".$this->table."` WHERE id = :id";
 			$oQueryBuilder = new QueryBuilder('SELECT', $this);
 
 			$oDatabaseHandler = self::getConnection();
 			$statement = $oDatabaseHandler->prepare($oQueryBuilder->getQuery(true));
-//			$statement->bindParam(':id', intval($this->id));
+			//			$statement->bindParam(':id', intval($this->id));
 			$statement->execute($oQueryBuilder->getPreparedValues());
 
 			$row = $statement->fetch(PDO::FETCH_ASSOC);
@@ -285,7 +285,7 @@ abstract class DataRecord {
 		if ($this->id == 0) {
 			throw new RecordException($this->table." object has no ID, can't delete it");
 		}
-		
+
 		$oQueryBuilder = new QueryBuilder('DELETE', $this);
 
 
@@ -304,6 +304,7 @@ abstract class DataRecord {
 
 	/**
 	 * Define a column for the object. Specify the right datatype, size and if it is required (null/ not null)
+	 * TODO add validators
 	 *
 	 * @param string $columnName
 	 * @param const $dataType data type
@@ -311,7 +312,7 @@ abstract class DataRecord {
 	 * @param bool $null false = not null / true = null
 	 */
 	protected function addColumn($columnName, $dataType, $size=null, $null=false) {
-		$attr = new Attribute($columnName);
+		$attr = new Column($columnName);
 		$attr->setFormattedName(str_replace('_', ' ', $columnName));
 		$attr->setType($dataType);
 		$attr->setSize($size);
@@ -330,7 +331,7 @@ abstract class DataRecord {
 	 * @param string $oColumnName
 	 * @return mixed
 	 */
-	protected function __get($oColumnName) {
+	public function __get($oColumnName) {
 		return $this->oColumns->$oColumnName;
 	}
 
@@ -339,7 +340,7 @@ abstract class DataRecord {
 	 * @param string $oColumnName
 	 * @param mixed $value
 	 */
-	protected function __set($oColumnName, $value) {
+	public function __set($oColumnName, $value) {
 		$this->oColumns->$oColumnName = $value;
 	}
 

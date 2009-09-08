@@ -1,6 +1,6 @@
 <?php
 
-/** 
+/**
  * class that represents an aggregate
  *
  * @package hosting_package
@@ -11,7 +11,7 @@
  */
 
 class ColumnAggr extends ArrayObject {
-	
+
 	private $aModified = array();
 
 	/**
@@ -37,7 +37,7 @@ class ColumnAggr extends ArrayObject {
 	/**
 	 * __get
 	 *
-	 * @param datatype $paramname description 
+	 * @param datatype $paramname description
 	 * @return datatype description
 	 */
 	public function __get($property) {
@@ -51,7 +51,7 @@ class ColumnAggr extends ArrayObject {
 	 * __set
 	 *
 	 * @access public
-	 * @param datatype $paramname description 
+	 * @param datatype $paramname description
 	 * @return datatype description
 	 */
 	public function __set($property, $sNewValue) {
