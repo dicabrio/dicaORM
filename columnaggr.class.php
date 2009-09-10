@@ -29,7 +29,7 @@ class ColumnAggr extends ArrayObject {
 	 *
 	 * @returns void
 	 */
-	public function add(Attribute $item) {
+	public function add(Column $item) {
 		parent::offsetSet($item->getName(), $item);
 	}
 

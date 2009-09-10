@@ -250,7 +250,6 @@ abstract class DataRecord {
 	 */
 	private function load() {
 		if ($this->oColumns->count()) {
-			//			$sql = "SELECT ".$this->attributes->getAttributesString()." FROM `".$this->table."` WHERE id = :id";
 			$oQueryBuilder = new QueryBuilder('SELECT', $this);
 
 			$oDatabaseHandler = self::getConnection();
