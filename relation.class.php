@@ -39,9 +39,9 @@ class Relation extends DataRecord {
 		self::setRawOutput(true);
 		$sRelationTable = $sThis.'_'.$sOther;
 		$sQuery = "	SELECT	*
-FROM	".$sRelationTable."
-WHERE	".$sThis."_id = :thisid
-AND ".$sOther."_id = :otherid " ;
+					FROM	`".$sRelationTable."`
+					WHERE	".$sThis."_id = :thisid
+					AND ".$sOther."_id = :otherid " ;
 
 		$aBindings = array('thisid' => $oThis->getID(), 'otherid' => $oOther->getID());
 		$aResult = parent::findBySql($sRelationTable, $sQuery, $aBindings);
@@ -67,6 +67,7 @@ AND ".$sOther."_id = :otherid " ;
 		if ($oThis === null && $oOther === null) {
 			throw new RecordException('Cannot retrieve relations if no relatable object is given');
 		}
+		
 
 		$sRelationTable = $sThis.'_'.$sOther;
 
@@ -81,13 +82,22 @@ AND ".$sOther."_id = :otherid " ;
 			$oReferenceObj = $oOther;
 		}
 
-		$query = "	SELECT `".$sSearchRelations."`.*
-FROM `".$sRelationTable."` AS t1
-LEFT JOIN `".$sSearchRelations."` AS t2
-ON t1.".$sSearchRelations."_id = t2.id
-WHERE t1.".$sReferenceRelation."_id = :referencid";
+		$query = "	SELECT t2.*
+					FROM `".$sRelationTable."` AS t1
+					LEFT JOIN `".$sSearchRelations."` AS t2
+					ON t1.".$sSearchRelations."_id = t2.id
+					WHERE t1.".$sReferenceRelation."_id = :referencid";
 
 		$aBind = array('referencid' => $oReferenceObj->getID());
 		return parent::findBySql($sSearchRelations, $query, $aBind);
+	}
+	
+	public static function getSingle($sThis, $sOther, DataRecord $oThis=null, DataRecord $oOther=null) {
+		$aOther = self::getOther($sThis, $sOther, $oThis, $oOther);
+		if (count($aOther) > 0) {
+			return current($aOther);
+		}
+		
+		return null;
 	}
 }
