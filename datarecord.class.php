@@ -133,7 +133,7 @@ abstract class DataRecord {
 	 * @param string $table
 	 * @param int $id
 	 */
-	public function __construct($table, $id=null, $sConnection=null) {
+	protected function __construct($table, $id=null, $sConnection=null) {
 
 		if ($sConnection !== null) {
 			self::$sDBConnectionName = $sConnection;
@@ -142,13 +142,12 @@ abstract class DataRecord {
 		$this->table = strtolower($table);
 
 		$this->oColumns = new ColumnAggr();
+		$this->addColumn('id', DataTypes::INT, false, true);
 		$this->defineColumns();
 
-		$this->id = intval($id);
-
-		if ($this->id > 0) {
-			$this->load();
-		}
+		$this->setAttr('id', intval($id));
+		
+		$this->loadRecord();
 	}
 
 	/**
@@ -160,6 +159,16 @@ abstract class DataRecord {
 	abstract protected function defineColumns();
 
 	/**
+	 * define validations for the object.
+	 * It is not defined abstract because it is optional. If you want to use it override it.
+	 * 
+	 * @returnn void
+	 */
+	protected function defineValidations() {
+
+	}
+
+	/**
 	 * define the relations and map them to properties
 	 *
 	 * @return void
@@ -168,16 +177,21 @@ abstract class DataRecord {
 		// it could be that no relations will ever be defined
 	}
 
+	/**
+	 * retrieve rawdata (arrays)
+	 * 
+	 * @param bool $bRaw
+	 */
 	protected function setRetrieveRawData($bRaw) {
 		self::$bRaw = $bRaw;
 	}
 
 	public function getID() {
-		return $this->id;
+		return (int)$this->getAttr('id');
 	}
 
 	public function setID($iID) {
-		$this->id = $iID;
+		$this->setAttr('id', $iID);
 	}
 
 	public function getTable() {
@@ -200,7 +214,7 @@ abstract class DataRecord {
 			return false;
 		}
 
-		if ($this->id > 0) {
+		if ($this->getAttr('id') > 0) {
 			$this->update();
 		} else {
 			$this->insert();
@@ -222,11 +236,11 @@ abstract class DataRecord {
 			throw new RecordException($errorInfo[2]);
 		}
 
-		$this->id = $oDatabaseHandler->lastInsertId();
+		$this->setAttr('id', $oDatabaseHandler->lastInsertId());
 	}
 
 	private function update() {
-		if (!$this->id) {
+		if (!$this->getAttr('id')) {
 			throw new RecordException($this->table." object needs an ID to update()");
 		}
 
@@ -248,30 +262,33 @@ abstract class DataRecord {
 	 * Load the object with data from the database
 	 *
 	 */
-	private function load() {
+	private function loadRecord() {
+
+		if ($this->getAttr('id') == 0) {
+			return;
+		}
+
+
 		if ($this->oColumns->count()) {
 			$oQueryBuilder = new QueryBuilder('SELECT', $this);
 
 			$oDatabaseHandler = self::getConnection();
 			$statement = $oDatabaseHandler->prepare($oQueryBuilder->getQuery(true));
-			//			$statement->bindParam(':id', intval($this->id));
 			$statement->execute($oQueryBuilder->getPreparedValues());
 
 			$row = $statement->fetch(PDO::FETCH_ASSOC);
 			// load the attribute values
 			if ($row === false) {
-				throw new RecordException('Record of '.get_class($this).' was not found with this id:'.$this->id);
+				throw new RecordException('Record of '.get_class($this).' was not found with this id:'.$this->getAttr('id'));
 			}
 
 			if (count($row) > 0) {
 				foreach ($row as $attribute => $value) {
-					if( $attribute == 'id' ) {
-						continue;
-					}
-
-					$this->$attribute = $value;
+					$this->setAttr($attribute, $value);
 				}
 			}
+
+			$this->oColumns->clearModifiedStatus();
 
 			$statement = null;
 		}
@@ -281,7 +298,7 @@ abstract class DataRecord {
 	 * @return void
 	 */
 	public function delete() {
-		if ($this->id == 0) {
+		if ($this->getAttr('id') == 0) {
 			throw new RecordException($this->table." object has no ID, can't delete it");
 		}
 
@@ -327,20 +344,31 @@ abstract class DataRecord {
 	}
 
 	/**
-	 * @param string $oColumnName
-	 * @return mixed
+	 *
+	 * @param <type> $oValidator
 	 */
-	public function __get($oColumnName) {
-		return $this->oColumns->$oColumnName;
+	protected function addValidator(ColumnValidator $oValidator) {
+		
+	}
+
+	/**
+	 * @param string $columnname
+	 * @return string
+	 */
+	protected function getAttr($columnname) {
+		return $this->oColumns->$columnname;
 	}
 
 
 	/**
 	 * @param string $oColumnName
 	 * @param mixed $value
+	 * @return DataRecord
 	 */
-	public function __set($oColumnName, $value) {
+	public function setAttr($oColumnName, $value) {
 		$this->oColumns->$oColumnName = $value;
+
+		return $this;
 	}
 
 	private static function getConnection($sConnection=null) {
@@ -379,11 +407,10 @@ abstract class DataRecord {
 			return $oStatement->fetchAll();
 		}
 
-
 		while ($aRow = $oStatement->fetch()) {
 			$oTmpObject = new $sClassName();
 			foreach ($aRow as $sKey => $sValue) {
-				$oTmpObject->$sKey = $sValue;
+				$oTmpObject->setAttr($sKey, $sValue);
 			}
 
 			$aResulObjects[] = $oTmpObject;

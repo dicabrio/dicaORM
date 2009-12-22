@@ -69,6 +69,10 @@ class ColumnAggr extends ArrayObject {
 		return count($this->aModified) > 0;
 	}
 
+	public function clearModifiedStatus() {
+		$this->aModified = array();
+	}
+
 	/**
 	 * @return string
 	 */
