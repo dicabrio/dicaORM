@@ -15,8 +15,8 @@ class Relation extends DataRecord {
 		parent::addColumn($sThisIDString, DataTypes::INT, false, true);
 		parent::addColumn($sOtherIDString, DataTypes::INT, false, true);
 
-		$this->$sThisIDString = $oThis->getID();
-		$this->$sOtherIDString = $oOther->getID();
+		$this->setAttr($sThisIDString, $oThis->getID());
+		$this->setAttr($sOtherIDString, $oOther->getID());
 	}
 
 	public function defineColumns() {
@@ -36,7 +36,9 @@ class Relation extends DataRecord {
 	}
 
 	public static function get($sThis, $sOther, DataRecord $oThis, DataRecord $oOther) {
-		self::setRawOutput(true);
+
+		parent::setRetrieveRawData(true);
+
 		$sRelationTable = $sThis.'_'.$sOther;
 		$sQuery = "	SELECT	*
 					FROM	`".$sRelationTable."`
@@ -52,6 +54,8 @@ class Relation extends DataRecord {
 			$oRelation->setID($aRelationRecord['id']);
 			$aRelations[] = $oRelation;
 		}
+
+		parent::setRetrieveRawData(false);
 		return $aRelations;
 	}
 

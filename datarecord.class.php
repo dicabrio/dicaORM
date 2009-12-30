@@ -210,6 +210,7 @@ abstract class DataRecord {
 	 * @return boolean
 	 */
 	public function save() {
+
 		if ($this->oColumns->isModified() === false) {
 			return false;
 		}
@@ -221,6 +222,7 @@ abstract class DataRecord {
 		}
 
 		return true;
+		
 	}
 
 	private function insert() {
@@ -356,7 +358,9 @@ abstract class DataRecord {
 	 * @return string
 	 */
 	protected function getAttr($columnname) {
+
 		return $this->oColumns->$columnname;
+		
 	}
 
 
@@ -366,9 +370,10 @@ abstract class DataRecord {
 	 * @return DataRecord
 	 */
 	public function setAttr($oColumnName, $value) {
+		
 		$this->oColumns->$oColumnName = $value;
-
 		return $this;
+
 	}
 
 	private static function getConnection($sConnection=null) {
@@ -391,10 +396,10 @@ abstract class DataRecord {
 	 * @return array
 	 */
 	protected static function findBySql($sClassName, $sQuery, $aBind=array(), $sConnectionName = null) {
+
 		$aResulObjects = array();
-
 		$oDatabaseHandler = self::getConnection($sConnectionName);
-
+		
 		$oStatement = $oDatabaseHandler->prepare($sQuery);
 		$oStatement->execute($aBind);
 
