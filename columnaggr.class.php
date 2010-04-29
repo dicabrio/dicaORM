@@ -55,6 +55,7 @@ class ColumnAggr extends ArrayObject {
 	 * @return datatype description
 	 */
 	public function __set($property, $sNewValue) {
+
 		if (parent::offsetExists($property)) {
 			$item = parent::offsetGet($property);
 			$sOldValue = $item->getValue();
@@ -63,14 +64,19 @@ class ColumnAggr extends ArrayObject {
 				$this->aModified[$property] = true;
 			}
 		}
+		
 	}
 
 	public function isModified() {
+
 		return count($this->aModified) > 0;
+		
 	}
 
 	public function clearModifiedStatus() {
+
 		$this->aModified = array();
+		
 	}
 
 	/**
