@@ -304,7 +304,7 @@ abstract class DataRecord {
 	 * @return void
 	 */
 	public function delete() {
-		
+
 		if ($this->getAttr('id') == 0) {
 			throw new RecordException($this->table." object has no ID, can't delete it");
 		}
@@ -333,7 +333,7 @@ abstract class DataRecord {
 	 * @param bool $null false = not null / true = null
 	 */
 	protected function addColumn($columnName, $dataType, $size=null, $null=false) {
-		
+
 		$attr = new Column($columnName);
 		$attr->setFormattedName(str_replace('_', ' ', $columnName));
 		$attr->setType($dataType);
@@ -489,7 +489,7 @@ abstract class DataRecord {
 
 	/**
 	 * You can compare object with eachother
-	 * 
+	 *
 	 * @param mixed $object
 	 * @return boolean
 	 */
